@@ -8,7 +8,7 @@ export default function App() {
   return (
     <div className="app">
       <header className="header">
-        <h1>Handlebars REPL</h1>
+        <h2>Handlebars REPL</h2>
       </header>
       <main className="content">
         <Editor onChange={setHtml} />

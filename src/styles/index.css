@@ -26,6 +26,7 @@ body {
 .header {
   z-index: 1;
   box-shadow: var(--box-shadow);
+  padding: 0 16px;
 }
 
 .content {

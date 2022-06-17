@@ -1,15 +1,12 @@
-import { useRef, useState } from "react";
-import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
+import { useState } from "react";
 import { useMount } from "../hooks/useMount";
+import MonacoEditor, { OnChange } from "@monaco-editor/react";
 
 const SAMPLE_TEMPLATE = `<div class="entry">
-	<h1>{{title}}</h1>
-	{{#if author}}
-	<h2>{{author.firstName}} {{author.lastName}}</h2>
-	{{else}}
-	<h2>Unknown Author</h2>
-	{{/if}}
-	{{contentBody}}
+<h1>{{title}}</h1>
+<div class="body">
+  {{body}}
+</div>
 </div>`;
 
 type EditorProps = {
@@ -17,32 +14,31 @@ type EditorProps = {
 };
 
 export const Editor = ({ onChange }: EditorProps) => {
-  const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor | null>(null);
-  const monacoEl = useRef(null);
+  const [template, setTemplate] = useState(SAMPLE_TEMPLATE);
 
   useMount(() => {
-    if (monacoEl && !editor) {
-      const editor = monaco.editor.create(monacoEl.current!, {
-        value: SAMPLE_TEMPLATE,
-        language: "handlebars",
+    onChange(template);
+  });
+
+  const onModelChange: OnChange = (value, event) => {
+    console.log({ event });
+    setTemplate(value ?? "");
+    onChange(template);
+  };
+
+  return (
+    <MonacoEditor
+      className="editor"
+      defaultLanguage="handlebars"
+      defaultValue={SAMPLE_TEMPLATE}
+      options={{
         roundedSelection: false,
         scrollBeyondLastLine: false,
         minimap: {
           enabled: false,
         },
-      });
-
-      editor.onDidChangeModelContent((_) => emitChange(editor));
-
-      emitChange(editor);
-      setEditor(editor);
-    }
-  });
-
-  const emitChange = (editor: monaco.editor.IStandaloneCodeEditor) => {
-    const currentValue = editor.getModel()?.getValue() ?? "";
-    onChange(currentValue);
-  };
-
-  return <div className="editor" ref={monacoEl}></div>;
+      }}
+      onChange={onModelChange}
+    />
+  );
 };
