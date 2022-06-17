@@ -31,8 +31,6 @@ export const Preview = ({ html = sampleHtml }: PreviewProps) => {
       const pdfBlob = await (await fetch(pdfApi, { method: "POST", body: formData })).blob();
       const pdfUrl = URL.createObjectURL(pdfBlob);
 
-      console.log({ indexBlob, pdfBlob, formData });
-
       setPdfUrl(pdfUrl);
     } catch (error) {
       console.error(error);
@@ -43,5 +41,5 @@ export const Preview = ({ html = sampleHtml }: PreviewProps) => {
     createPdf(html);
   }, [html]);
 
-  return <iframe className="preview" src={pdfUrl} />;
+  return <iframe className="preview" src={pdfUrl} seamless={true} />;
 };

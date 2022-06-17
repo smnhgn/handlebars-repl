@@ -12,25 +12,37 @@ const SAMPLE_TEMPLATE = `<div class="entry">
 	{{contentBody}}
 </div>`;
 
-export const Editor = () => {
+type EditorProps = {
+  onChange: (html: string) => void;
+};
+
+export const Editor = ({ onChange }: EditorProps) => {
   const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor | null>(null);
   const monacoEl = useRef(null);
 
   useMount(() => {
     if (monacoEl && !editor) {
-      setEditor(
-        monaco.editor.create(monacoEl.current!, {
-          value: SAMPLE_TEMPLATE,
-          language: "handlebars",
-          roundedSelection: false,
-          scrollBeyondLastLine: false,
-          minimap: {
-            enabled: false
-          }
-        })
-      );
+      const editor = monaco.editor.create(monacoEl.current!, {
+        value: SAMPLE_TEMPLATE,
+        language: "handlebars",
+        roundedSelection: false,
+        scrollBeyondLastLine: false,
+        minimap: {
+          enabled: false,
+        },
+      });
+
+      editor.onDidChangeModelContent((_) => emitChange(editor));
+
+      emitChange(editor);
+      setEditor(editor);
     }
   });
+
+  const emitChange = (editor: monaco.editor.IStandaloneCodeEditor) => {
+    const currentValue = editor.getModel()?.getValue() ?? "";
+    onChange(currentValue);
+  };
 
   return <div className="editor" ref={monacoEl}></div>;
 };
