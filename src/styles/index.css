@@ -1,5 +1,8 @@
 @import "reset.css";
-@import "editor.css";
+
+:root {
+  --box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+}
 
 body {
   margin: 0;
@@ -20,8 +23,24 @@ body {
   flex-direction: column;
 }
 
+.header {
+  z-index: 1;
+  box-shadow: var(--box-shadow);
+}
+
 .content {
+  margin: 1rem;
   flex: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
+}
+
+.editor {
+  width: 100%;
+  height: 100%;
+}
+
+.preview {
+  width: 100%;
+  height: 100%;
 }

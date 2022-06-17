@@ -24,6 +24,9 @@ export const Editor = () => {
           language: "handlebars",
           roundedSelection: false,
           scrollBeyondLastLine: false,
+          minimap: {
+            enabled: false
+          }
         })
       );
     }
