@@ -1,5 +1,7 @@
 import { useState } from "react";
-import MonacoEditor, { OnChange } from "@monaco-editor/react";
+import MonacoEditor, { OnChange, OnMount } from "@monaco-editor/react";
+import hbs from "handlebars";
+import debounce from "lodash.debounce";
 import { EditorSelect } from "./EditorSelect";
 
 const SAMPLE_TEMPLATE = `<div class="entry">
@@ -34,17 +36,35 @@ export const Editor = ({ onChange }: EditorProps) => {
   });
   const editor = editorConfig[fileName];
 
-  const onModelChange: OnChange = (value) => {
+  const onModelChangeBase: OnChange = (value) => {
     const currentValue = editorConfig[fileName].value;
 
     if (value && value !== currentValue) {
-      setEditorConfig({
+      const updatedConfig = {
         ...editorConfig,
         [fileName]: {
           ...editorConfig[fileName],
           value,
         },
-      });
+      };
+      setEditorConfig(updatedConfig);
+      emitChange(updatedConfig);
+    }
+  };
+  const onModelChange = debounce(onModelChangeBase, 1000);
+
+  const onModelMount: OnMount = (_) => {
+    emitChange(editorConfig);
+  };
+
+  const emitChange = (config = editorConfig) => {
+    try {
+      const template = hbs.compile(config["index.html"].value);
+      const context = JSON.parse(config["context.json"].value);
+
+      onChange(template(context));
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -67,6 +87,7 @@ export const Editor = ({ onChange }: EditorProps) => {
           },
         }}
         onChange={onModelChange}
+        onMount={onModelMount}
       />
     </div>
   );
